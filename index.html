@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SEMAP Perú</title>
+    <link rel="stylesheet" href="vendor/leaflet.css">
+    <link rel="stylesheet" href="estilos.css">
+</head>
+
+<body>
+    <header>
+        <div class="brand"><span class="mark">◈</span>
+            <div><strong>SEMAP Perú</strong><small>Selector de mapas del Perú</small></div>
+        </div>
+        <div class="header-actions" role="group" aria-label="Exportar vista del mapa"><button id="export-image"
+                type="button">Guardar imagen</button><button id="export-pdf" type="button">Guardar PDF</button></div>
+    </header>
+    <main>
+        <aside>
+            <div>
+                <div class="eyebrow">TU MAPA</div>
+                <h1>Colorea territorios</h1>
+                <p class="intro">Elige un nivel y un color. Haz clic para pintar y doble clic para quitar el color.</p>
+            </div>
+            <section class="area-filter">
+                <div class="step">
+                    <h2>Zona del mapa</h2>
+                </div>
+                <p class="level-hint">Elige uno o varios departamentos y, si deseas, provincias. Sin selección se
+                    muestra todo el Perú.</p>
+                <details>
+                    <summary>Departamentos <span id="department-count">Todos</span></summary>
+                    <div class="filter-list" id="department-options"></div>
+                </details>
+                <details>
+                    <summary>Provincias <span id="province-count">Todas</span></summary>
+                    <p class="filter-help">Selecciona primero uno o más departamentos. Si no eliges provincias de un
+                        departamento, se muestra completo.</p>
+                    <div class="filter-list" id="province-options"></div>
+                </details>
+                <p class="level-hint" id="partial-boundary-note" hidden>Al filtrar provincias se oculta el contorno
+                    departamental completo para no mostrar líneas fuera de la zona elegida.</p><button id="clear-filter"
+                    class="filter-clear" type="button">Mostrar todo el Perú</button>
+            </section>
+            <section>
+                <div class="step">
+                    <h2>Niveles y límites visibles</h2>
+                </div>
+                <div class="levels" role="group" aria-label="Niveles territoriales visibles"><button class="active"
+                        data-level="departamento" aria-pressed="true">Departamento</button><button class="active"
+                        data-level="provincia" aria-pressed="true">Provincia</button><button class="active"
+                        data-level="distrito" aria-pressed="true">Distrito</button></div>
+                <p class="level-hint">Selecciona uno o varios niveles. Mantén al menos uno activo.</p>
+                <p class="level-hint paint-level" id="paint-level">Al colorear: distrito (nivel más detallado)</p>
+            </section>
+            <section>
+                <div class="step">
+                    <h2>Color de relleno</h2>
+                </div>
+                <div id="palette" class="palette" role="group" aria-label="Colores de relleno"></div><label
+                    class="custom">Color personalizado <input id="custom" type="color" value="#4f46f5"
+                        aria-label="Color personalizado"></label>
+            </section>
+            <section class="visibility-options"><label><input type="checkbox" id="only-colored"> <span>Ocultar límites y nombres de zonas sin colorear</span></label><p>Las áreas sin color siguen disponibles para pintar.</p></section>
+            <section class="boundary-legend" aria-label="Colores de límites">
+                <div class="step">
+                    <h2>Límites</h2>
+                </div>
+                <div><i class="line department"></i>Departamento</div>
+                <div><i class="line province"></i>Provincia</div>
+                <div><i class="line district"></i>Distrito</div>
+            </section><button id="reset" class="reset">Borrar todos los colores</button>
+            <footer>Los colores se guardan en este navegador.<br><a href="https://github.com/Rodasluis/Peru-maps"
+                    target="_blank" rel="noopener">Fuente cartográfica ↗</a> · Límites referenciales</footer>
+        </aside>
+        <div class="map-area">
+            <div class="map-top">
+                <div><span class="dot"></span> PERÚ <span class="divider">/</span> <span
+                        id="level-label">DISTRITOS</span></div><span>Un clic para pintar · Doble clic para quitar</span>
+            </div>
+            <div id="map" aria-label="Mapa interactivo del Perú"></div>
+            <div id="status" class="status">Acerca el mapa y selecciona un territorio</div>
+            <div id="error" hidden>No se pudo cargar el mapa. Comprueba que los archivos del proyecto estén completos.
+            </div>
+        </div>
+    </main>
+    <dialog id="export-dialog" aria-labelledby="export-title">
+        <div class="export-modal">
+            <div class="export-heading">
+                <div>
+                    <h2 id="export-title">Vista previa</h2>
+                    <p>Arrastra el recuadro para moverlo y sus esquinas para cambiar su tamaño.</p>
+                </div><button id="export-close" type="button" aria-label="Cerrar vista previa">×</button>
+            </div>
+            <div class="preview-scroll">
+                <div id="preview-stage" class="preview-stage"><img id="preview-image"
+                        alt="Vista actual del mapa para seleccionar el área de exportación">
+                    <div id="crop-box" class="crop-box" aria-label="Área seleccionada"><span
+                            class="crop-attribution">Fuente: Peru-maps / INEI · Límites referenciales</span><span
+                            class="crop-handle" data-corner="nw"></span><span class="crop-handle"
+                            data-corner="ne"></span><span class="crop-handle" data-corner="sw"></span><span
+                            class="crop-handle" data-corner="se"></span></div>
+                </div>
+            </div>
+            <div class="crop-fields" aria-label="Ajustar área en porcentajes"><label>Izquierda % <input type="number"
+                        id="crop-x" min="0" max="99"></label><label>Arriba % <input type="number" id="crop-y" min="0"
+                        max="99"></label><label>Ancho % <input type="number" id="crop-w" min="1"
+                        max="100"></label><label>Alto % <input type="number" id="crop-h" min="1" max="100"></label>
+            </div>
+            <p class="export-message" id="export-message" role="status"></p>
+            <div class="export-actions"><button id="export-cancel" type="button">Cancelar</button><button
+                    id="export-confirm" type="button">Descargar</button></div>
+        </div>
+    </dialog>
+    <script src="vendor/leaflet.js"></script>
+    <script src="data/distrito.js"></script>
+    <script src="data/provincia.js"></script>
+    <script src="data/departamento.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
