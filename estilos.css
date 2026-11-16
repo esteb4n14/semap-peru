@@ -921,27 +921,36 @@ a:focus-visible {
 }
 
 .line.department {
-    border-color: #1769D2
+    position: relative;
+    border-top: 4px solid #ffffff;
+    border-color: #ffffff
 }
 
 .line.province {
-    border-color: #10A46B
+    position: relative;
+    border-top: 4px solid #ffffff;
+    border-color: #ffffff
 }
 
 .line.district {
     position: relative;
-    border-top: 3px solid #ffffff;
+    border-top: 4px solid #ffffff;
     border-color: #ffffff
 }
 
+.line.department::after,
+.line.province::after,
 .line.district::after {
     content: '';
     position: absolute;
     left: 0;
     right: 0;
     top: 1px;
-    border-top: 1px solid #000000
+    border-top: 2px solid #000000
 }
+
+.line.department::after { border-top-color: #1769D2 }
+.line.province::after { border-top-color: #10A46B }
 
 .header-actions {
     display: flex;
