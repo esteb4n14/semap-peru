@@ -952,6 +952,35 @@ a:focus-visible {
 .line.department::after { border-top-color: #1769D2 }
 .line.province::after { border-top-color: #10A46B }
 
+/* Muestras de leyenda: marco blanco y línea de color centrada. */
+.boundary-legend .line {
+    position: relative;
+    display: inline-block;
+    flex: 0 0 68px;
+    width: 68px;
+    height: 22px;
+    border: 2px solid #ffffff;
+    background: transparent;
+}
+
+.boundary-legend .line::after,
+.boundary-legend .line.department::after,
+.boundary-legend .line.province::after,
+.boundary-legend .line.district::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    right: 3px;
+    top: 7px;
+    height: 4px;
+    border: 0;
+    background: #000000;
+}
+
+.boundary-legend .line.department::after { background: #1769D2; }
+.boundary-legend .line.province::after { background: #10A46B; }
+.boundary-legend .line.district::after { background: #000000; }
+
 .header-actions {
     display: flex;
     align-items: center;
