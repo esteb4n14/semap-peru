@@ -958,7 +958,7 @@ a:focus-visible {
     display: inline-block;
     flex: 0 0 68px;
     width: 68px;
-    height: 22px;
+    height: 12px;
     border: 2px solid #ffffff;
     background: transparent;
 }
@@ -969,9 +969,9 @@ a:focus-visible {
 .boundary-legend .line.district::after {
     content: '';
     position: absolute;
-    left: 3px;
-    right: 3px;
-    top: 7px;
+    left: 2px;
+    right: 2px;
+    top: 2px;
     height: 4px;
     border: 0;
     background: #000000;
