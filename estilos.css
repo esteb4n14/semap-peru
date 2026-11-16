@@ -929,7 +929,18 @@ a:focus-visible {
 }
 
 .line.district {
-    border-color: #000000
+    position: relative;
+    border-top: 3px solid #ffffff;
+    border-color: #ffffff
+}
+
+.line.district::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 1px;
+    border-top: 1px solid #000000
 }
 
 .header-actions {
