@@ -24,12 +24,15 @@
     // Las capas cartográficas se dibujan en lienzos compartidos; la capa de
     // interacción sigue usando SVG para conservar la selección precisa.
     const districtRenderer = L.canvas({ padding: .2 });
+    const districtHalo = L.geoJSON(data.distrito, { renderer: districtRenderer, style: f => ({ color: '#ffffff', weight: 3.2, opacity: selectedLevels.has('distrito') && (!onlyColored || painted[f.properties.ubigeo]) ? .98 : 0, fill: false }), interactive: false }).addTo(map);
     const districts = L.geoJSON(data.distrito, { renderer: districtRenderer, style: districtStyle, interactive: false }).addTo(map);
     // Las líneas superiores no capturan clics: solo refuerzan la jerarquía territorial.
     map.createPane('limites');
     map.getPane('limites').style.zIndex = 410;
     map.getPane('limites').style.pointerEvents = 'none';
     const boundaryRenderer = L.canvas({ pane: 'limites', padding: .2 });
+    const provinceHalo = L.geoJSON(data.provincia, { renderer: boundaryRenderer, pane: 'limites', interactive: false, style: { color: '#ffffff', weight: 3.8, opacity: .98, fill: false } }).addTo(map);
+    const departmentHalo = L.geoJSON(data.departamento, { renderer: boundaryRenderer, pane: 'limites', interactive: false, style: { color: '#ffffff', weight: 5, opacity: .98, fill: false } }).addTo(map);
     const provinces = L.geoJSON(data.provincia, { renderer: boundaryRenderer, pane: 'limites', interactive: false, style: { color: '#10A46B', weight: 1.35, opacity: .95, fill: false } }).addTo(map);
     const departments = L.geoJSON(data.departamento, { renderer: boundaryRenderer, pane: 'limites', interactive: false, style: { color: '#1769D2', weight: 2.2, opacity: 1, fill: false } }).addTo(map);
     // Recortar las líneas provinciales y departamentales al área coloreada,
@@ -51,6 +54,9 @@
     };
     function refreshColoredVisibility() {
       districts.setStyle(districtStyle);
+      districtHalo.setStyle(f => ({ opacity: selectedLevels.has('distrito') && (!onlyColored || painted[f.properties.ubigeo]) ? .98 : 0 }));
+      provinceHalo.setStyle({ opacity: selectedLevels.has('provincia') ? .98 : 0 });
+      departmentHalo.setStyle({ opacity: selectedLevels.has('departamento') ? .98 : 0 });
       boundaryRenderer._redrawBounds = null;
       boundaryRenderer._redraw();
       scheduleNames();
@@ -172,9 +178,12 @@
       scoped = { distrito: { type: 'FeatureCollection', features: selectedDistrictFeatures }, provincia: { type: 'FeatureCollection', features: selectedProvinceFeatures }, departamento: { type: 'FeatureCollection', features: interactionDepartments } };
       baseTerritorial.clearLayers().addData(scoped.distrito);
       districts.clearLayers().addData(scoped.distrito);
+      districtHalo.clearLayers().addData(scoped.distrito);
       provinces.clearLayers().addData(scoped.provincia);
+      provinceHalo.clearLayers().addData(scoped.provincia);
       // Sin recortar la geometría, un departamento parcial mostraría líneas fuera de la zona.
       departments.clearLayers().addData({ type: 'FeatureCollection', features: selectedDepartmentFeatures.filter(f => ![...selectedProvinces].some(id => id.startsWith(f.properties.ubigeo))) });
+      departmentHalo.clearLayers().addData({ type: 'FeatureCollection', features: selectedDepartmentFeatures.filter(f => ![...selectedProvinces].some(id => id.startsWith(f.properties.ubigeo))) });
       renderFilters();
       updateLevels();
       const bounds = districts.getBounds();
